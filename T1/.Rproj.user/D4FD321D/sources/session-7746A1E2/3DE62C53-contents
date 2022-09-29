@@ -1,0 +1,427 @@
+---
+title: "Tarea 1 EYP2117"
+format: 
+  html:
+    self-contained: true
+    code-summary: "Código"
+editor: visual
+lang: es
+theme: darkly
+---
+
+# Pregunta 1
+
+Considere el volumen generado por:
+
+$$
+\iint_R x\cdot y^2\sqrt{x^2+y^3} \,dR
+$$
+
+donde $R = [0,3]\times[0,2]$
+
+Importamos los paquetes a utilizar
+
+```{r}
+library(pracma)
+```
+
+### a) Realice en R un gráfico que muestre el volumen de interés.
+
+```{r}
+set.seed(2117)
+integral <- function(x,y){
+  hx <-  x*y^2*sqrt(x^2+y^3)
+  return(hx)
+}
+
+rango_x <- seq(0,3,length = 50)
+rango_y <- seq(0,2,length = 50)
+z <- outer(rango_x,rango_y,integral)
+
+par(bg = "gray70")
+persp(rango_x, rango_y, z,
+      main = "Volumen a integrar",
+      xlab = "x",
+      ylab = "y",
+      theta = 35, phi = 15,
+      col = "cyan"
+      )
+```
+
+### b) Interesa estimar la integral mediante la simulación de variables aleatorias con distribución Uniforme(0,1). Derive analíticamente la forma que toma la expresión en el nuevo hipercubo.
+
+Consideremos la expresion
+
+$$
+\theta = \int_{a}^{b}\dots\int_{c}^{d}g(x_1,x_2,\dots,x_n)\,dx_1\,dx_2\cdots \,dx_n
+$$
+
+sabemos que $U_1,U_2 \overset{\text{iid}}{\sim} U(0,1)$, por lo que
+
+$$
+\mathbb{E}(g(u_1,u_2,\cdots,u_n)) = \int_{0}^{1}\cdots\int_{0}^{1}g(u_1,u_2,\cdots,u_n)(b-a)\cdots(d-c)\,du_1\,du_2\cdots\,du_n
+$$
+
+así, podemos aproximar $\theta$ generando $m$ vectores $U(0,1)$ de largo $n$
+
+$$
+\frac{1}{n}\sum_{i = 1}^{m}g(u_{i1},g_{i2},\cdots,g_{in}).
+$$
+
+Ahora, en nuestro caso, $\theta$ está representado por
+
+$$
+\theta = \int_{0}^{3}\int_{0}^{2}x\cdot y^2\sqrt{x^2+y^3}\,dy\,dx
+$$
+
+luego, generamos $U_1,U_2\overset{\text{iid}}{\sim}U(0,1)$ para así, llegar a la expresión
+
+$$
+\int_{0}^{1}\int_{0}^{1}g(u_1,u_2)\cdot(3-0)(2-0)\,du_1\,du_2
+$$
+
+con $g(u_1,u_2) = u_1\cdot u_2^2\sqrt{u_1^2+u_2^3}$.
+
+Finalmente, aproximamos el valor de $\theta$ de la forma
+
+$$
+\hat{\theta}=\frac{1}{n}\sum_{i = 1}^{m}g(u_{i1},u_{i2})
+$$
+
+### c) Escriba en R un programa que estime el valor de la integral en base a vectores aleatorios de tamaño $n$.
+
+```{r}
+estimador <- function(N){
+  U1 <- runif(N,0,3)
+  U2 <- runif(N,0,2)
+  hx <- U1*U2^2*sqrt(U1^2+U2^3)*6
+  return(mean(hx))
+}
+```
+
+### d) Estime el valor de la integral en vase muestras de tamaño $n = 10^2$, $10^3$, $10^4$. Compare los resultados con el valor real obtenido mediante la función `integral2` de la libreria `pracma` . Comente
+
+```{r}
+N_1 <- 10^2
+N_2 <- 10^3
+N_3 <- 10^4
+#Para n = 10^2
+estimador(N_1)
+#Para n = 10^3
+estimador(N_2)
+#Para n = 10^4
+estimador(N_3)
+#Valor real
+valor_real <- pracma::integral2(integral, 0, 3, 0, 2)
+valor_real[1]
+
+```
+
+Podemos apreciar que para el caso cuando $n = 10^2$, este sobre estima el valor de la integral.
+
+Para $n = 10^3$, al igual que el caso anterior, sobre estimó por unos decimales el valor real.
+
+Y para $n = 10^4$, estimó un valor menor al real, pero significativamente más cercano al valor real.
+
+Con estos test podemos concluir que a medida que $n \to \infty$, se genera una mejor estimación. Sin embargo, no hay que olvidar que estamos buscando una aproximación al valor real y además estamos trabajando con la aleatoriedad de los vectores generados $U_1,U_2 \overset{\text{iid}}{\sim} U(0,1)$.
+
+# Pregunta 2
+
+Para el cálculo de la esperanza $\mathbb{E}_f[h(x)]$ cuando $f$ es la distribución Normal(0,1) y $h(x) = \exp\left(\frac{-(x-3)^2}{2}\right)+\exp\left(\frac{-(x-6)^2}{2}\right)$:
+
+### a) Demuestre que $\mathbb{E}_f[h(x)]$ se puede calcular en forma cerrada y obtenga su valor
+
+Sabemos que cuando $X \sim Normal(0,1)$, su pdf viene de la forma:
+
+$$
+f(x) = \dfrac{1}{\sqrt{2\pi}}\cdot \exp\left(\dfrac{-x^2}{2}\right)
+$$
+
+por lo que para el cálculo de $\mathbb{E}_f[h(x)]$, esto se ve representado como
+
+$$
+\begin{align*}
+\mathbb{E}_f[h(x)] &= \int_{-\infty}^{\infty}\dfrac{1}{\sqrt{2\pi}}\cdot \exp\left(\dfrac{-x^2}{2}\right)\cdot\left(\exp\left(\frac{-(x-3)^2}{2}\right)+\exp\left(\frac{-(x-6)^2}{2}\right)\right)\,dx\\
+&=\dfrac{1}{\sqrt{2\pi}}\cdot\int_{-\infty}^{\infty}\exp\left(\dfrac{-x^2}{2}\right)\cdot\left(\exp\left(\frac{-(x-3)^2}{2}\right)+\exp\left(\frac{-(x-6)^2}{2}\right)\right)\,dx\\
+&=\dfrac{1}{\sqrt{2\pi}}\cdot\int_{-\infty}^{\infty}\exp\left(\dfrac{-x^2-(x^2-6x+9)}{2}\right)+\exp\left(\dfrac{-x^2-(x^2-12x+36)}{2}\right)\,dx\\
+&=\dfrac{1}{\sqrt{2\pi}}\cdot\int_{-\infty}^{\infty}\exp\left(\dfrac{-2x^2+6x-9}{2}\right)+\exp\left(\dfrac{-2x^2+12x-36}{2}\right)\,dx\\
+&=\dfrac{1}{\sqrt{2\pi}}\cdot\left[\exp\left(\frac{-9}{4}\right)\cdot\int_{-\infty}^{\infty}\exp\left(-\left(x-\frac{3}{2}\right)^2\right)+\exp(-9)\cdot\int_{-\infty}^{\infty}\exp\left(-(x-3)^2\right)\right]\,dx\\
+\end{align*} 
+$$
+
+luego, usando la generalización de la integral de una función gaussiana
+
+$$
+\int_{-\infty}^{\infty}\exp(-a(x+b))^2\,dx = \sqrt{\dfrac{\pi}{a}}
+$$
+
+en nuestro caso
+
+$$
+\begin{align*}
+&\int_{-\infty}^{\infty}\exp\left(-\left(x-\frac{3}{2}\right)\right)^2\,dx = \sqrt{\pi}\\
+\\
+&\int_{-\infty}^{\infty}\exp\left(-\left(x-3\right)\right)^2\,dx = \sqrt{\pi}
+\end{align*}
+$$
+
+reemplazando en la expresión
+
+$$
+\begin{align*}
+\mathbb{E}_f[h(x)] &= \dfrac{1}{\sqrt{2\pi}}\left[\exp\left(-\frac{9}{4}\right)\cdot\sqrt{\pi}+\exp\left(-9\right)\sqrt{\pi}\right]\\
+&= \dfrac{1}{\sqrt{2}}\left[\exp\left(-\frac{9}{4}\right)+\exp(-9)\right]
+\end{align*}
+$$
+
+así, llegamos a que $\mathbb{E}_f[h(x)]$ se puede calcular de forma cerrada.
+
+### b) Implemente en R una aproximación regular de Monte Carlo basada en una muestra Normal(0,1)
+
+Por lo visto en clases, sabemos que podemos generar $g_i \sim Normal(0,1)$ dado $U_i \sim Uniforme(0,1)$, $i = 1,2,...$ aplicando la transformación
+
+$$
+\begin{align*}
+0 &< U < 1\\
+0 &< \frac{U}{1-U} < \infty\\
+-\infty &< \log\left(\frac{U}{1-U}\right) < \infty
+\end{align*}
+$$
+
+en donde $g = log\left(\frac{U}{1-U}\right) \sim Normal(0,1)$.
+
+```{r}
+sim <- function(N){
+  U <- runif(N)
+  g <- log(U/(1-U))
+  
+  hx <- (1/sqrt(2*pi)*exp(-g^2/2)*(exp(-(g-3)^2/2)+
+          exp(-(g-6)^2/2)))*1/(U*(1-U))
+  
+  return(mean(hx))
+}
+```
+
+### c) Realice un gráfico que permita visualizar la estimación de $\mathbb{E}_f[h(x)]$ a medida que aumenta el tamaño de la muestra utilizada con este fin. Comience con una muestra de tamaño 1, a la que se le agrega nuesvas realizaciones (de a 1) hasta llegar a $10^4$. Comente
+
+```{r}
+N <- 10^4
+seq <- seq(1,N)
+muestras <- c()
+for(i in 1:N){
+  muestras <- append(muestras, sim(i))
+}
+par(bg = "gray70")
+plot(seq, muestras, xlab = "Realizaciones", ylab = "Valor estimado",
+     main = "Estimación de E[h(x)]", col = "deepskyblue2")
+```
+
+Podemos apreciar que a medida que se aumentan las realizaciones, el gráfico de dispersión va convirgiendo a una aproximación más precisa de la integral.
+
+### d) Realice un gráfico que permita visualizar la precisión de la estimación de $\mathbb{E}_f[h(x)]$ a medida que aumenta el tamaño de la muestra utilizada con este fin. Comience con una muestra de tamaño 1, a la que se le agrega nuevas realizaciones (de a 1) hasta llegar a $10^4$. Comente.
+
+Para encontrar el valor real de la integral, la calculamos usando la libreria `pracma`, con la función `integral`
+
+```{r}
+funcion_esp <- function(x){
+  hx <- (1/sqrt(2*pi)*exp(-x^2/2)*(exp(-(x-3)^2/2)+exp(-(x-6)^2/2)))
+  return(hx)
+}
+
+(valor_real_esp <- pracma::integral(funcion_esp,-Inf,Inf))
+```
+
+ahora, podemos realizar el gráfico de la precisión de la estimación.
+
+```{r}
+N_1 <- 10^4
+seq_1 <- seq(1,N_1)
+precision <- c()
+for(i in 1:N_1){
+  precision <- append(precision, valor_real_esp - sim(i))
+}
+par(bg = "gray70")
+plot(seq_1, precision, xlab = "Realizaciones", ylab = "Precisión",
+     main = "Precisión de la estimación de E[h(x)]", col = "navy")
+```
+
+Apreciamos al igual que el gráfico anterior, a medida que aumentan las simulaciones, la precisión va tendiendo a 0, es decir, se acerca cada vez mas al valor real.
+
+# Pregunta 3
+
+Considere una variable aleatoria, $X$, con función de densidad dada por:
+
+$$
+f(x) = \begin{cases}
+0 & \text{si}\ & x<2a\quad\text{o}\quad x\geq 2b\\
+\dfrac{x-2a}{(b-a)^2} & \text{si} & 2a \leq x < a+b\\
+\dfrac{(2b-x)}{(b-a)^2} & \text{si} & a+b \leq x < 2b 
+\end{cases}
+$$
+
+### a) Derive la función de distribución de la variable aleatoria $X$.
+
+-   Para $x < 2a \text{ y } x \geq 2b$:
+
+$$
+F(x) = \int_{-\infty}^{x}0\,dt = 0
+$$
+
+-   Para $2a \leq x < a+b$:
+
+$$
+\begin{align*}
+F(x) &= \int_{2a}^{x}\dfrac{t-2a}{(b-a)^2}\,dt\\
+&=\dfrac{1}{(b-a)^2}\cdot\int_{2a}^{x}t-2a\,dt\\
+&=\dfrac{1}{(b-a)^2}\cdot\left(\int_{2a}^{x}t\,dt -\int_{2a}^{x}2a\,dt\right)\\
+&=\dfrac{1}{(b-a)^2}\cdot\left(\dfrac{x^2}{2}-2a^2-(2ax-4a^2)\right)\\
+&=\dfrac{4a^2-4ax+x^2}{2(b-a)^2}
+\end{align*}
+$$
+
+-   Para $a+b \leq x < 2b$:
+
+$$
+\begin{align*}
+F(x) &= \int_{2a}^{a+b}\dfrac{t-2a}{(b-a)^2}\,dt+\int_{a+b}^{x}\dfrac{2b-t}{(b-a)^2}\,dt\\
+&= \dfrac{1}{2}+\dfrac{1}{(b-a)^2}\int_{b+a}^{x}2b-t\,dt\\
+&= \dfrac{1}{2}+\dfrac{1}{(b-a)^2}\left(\int_{b+a}^{x}2b\,dt-\int_{b+a}^{x}t\,dt\right)\\
+&= \dfrac{1}{2}+\dfrac{1}{(b-a)^2}\left(-\dfrac{x^2-b^2-2ab-a^2}{2}+2bx-2b(a+b)\right)\\
+&= \dfrac{1}{2}-\dfrac{x^2-4bx+3b^2-a^2+2ab}{2(b-a)^2}
+\end{align*}
+$$
+
+-   Para $x\geq2b$:
+
+$$
+F(x) = \int_{-\infty}^{x}f(t)\,dt = 1
+$$
+
+Así, la función de distribución queda de la forma
+
+$$
+F(x) =\begin{cases}
+0 &\text{si}\ &x<2a \quad\text{o}\quad x\geq2b\\
+\dfrac{4a^2-4ax+x^2}{2(b-a)^2} &\text{si}\ &2a\leq x<a+b\\
+\dfrac{1}{2}-\dfrac{x^2-4bx+3b^2-a^2+2ab}{2(b-a)^2} &\text{si}\ & a+b \leq x < 2b\\
+1 &\text{si}\ &x\geq 2b
+\end{cases}
+$$
+
+### b) Muestre que, de acuerdo al método de la transformada inversa, la simulación de valores provinientes de $f(x)$ se realiza mediante:
+
+$$
+X = \begin{cases}
+2a+(b-a)\sqrt{2U}\quad&\text{si}\quad 0\leq U<\frac{1}{2}\\
+2b+(a-b)\sqrt{2(1-U)}\quad&\text{si}\quad \frac{1}{2}\leq U <1
+\end{cases}
+$$
+
+Recordando que el método de la transformada inversa para variables aleatorias continuas era de la forma
+
+$$
+U \overset{\text{iid}}{\sim} U(0,1),\text{tal que } X = F^{-1}(U) 
+$$
+
+Es decir, dada una función de distribución $F(x)$, la igualamos a la variable $U$ y calculamos su inversa.
+
+Para $0 \leq U < \frac{1}{2}$:
+
+$$
+\begin{align*}
+U &= \dfrac{4a^2-4ax+x^2}{2(b-a)^2}\\
+4a^2-4ax+x^2 &= 2U(b-a)^2\\
+4a^2-4ax+x^2 &= 2a^2U-4ab+4b^2U\\
+x^2-4ax+4a^2-&2b^2U+4abU-2a^2U = 0
+\end{align*}
+$$Aplicando la fórmula general para ecuaciones de segundo grado:
+
+$$
+\begin{align*}
+x &= \dfrac{-(-4a)\pm\sqrt{(-4a)^2-4\cdot1\cdot(4a^2-2b^2U+4abU-2a^2U)}}{2\cdot1}\\
+&= \dfrac{4a\pm\sqrt{4\cdot2U(b^2-2ab+a^2)}}{2}\\
+&= 2a+(b-a)\sqrt{2U}
+\end{align*}
+$$
+
+Luego, para $\frac{1}{2}\leq U <1$:
+
+$$
+\begin{align*}
+U &= \dfrac{1}{2}-\dfrac{x^2-4bx+3b^2-a^2+2ab}{2(b-a)^2}\\
+2U(b-a)^2 &= (b-a)^2-(x^2-4bx+3b^2-a^2+2ab)\\
+2b^2U-4abU+2a^2U &= -x^2+4bx-2b^2+2a^2-4ab\\
+-x^2+4bx-2b^2+2a^2-&4ab-2a^2U+4abU-2b^2U = 0
+\end{align*}
+$$ Aplicando nuevamente la fórmula general para ecuaciones de segundo grado:
+
+$$
+\begin{align*}
+x &= \dfrac{-4b\pm\sqrt{(4b)^2-4\cdot-1(-2b^2+2a^2-4ab-2a^2U+4abU-2b^2U)}}{2\cdot-1}\\
+&= \dfrac{-4b\pm\sqrt{8(b^2
+a^2-2ab)-8U(a^2-2ab+b^2)}}{-2}\\
+&= \dfrac{-4b\pm\sqrt{(a-b)^2(8-8U)}}{-2}\\
+&= \dfrac{-4b + 2(a-b)\sqrt{2(1-U)}}{-2}\\
+&= 2b+(a-b)\sqrt{2(1-U)}
+\end{align*}
+$$
+
+Finalmente, $X$ queda de la forma
+
+$$
+X = \begin{cases}
+2a+(b-a)\sqrt{2U}\quad&\text{si}\quad 0\leq U<\frac{1}{2}\\
+2b+(a-b)\sqrt{2(1-U)}\quad&\text{si}\quad \frac{1}{2}\leq U <1
+\end{cases}
+$$
+
+### c) Escriba paso a paso el algoritmo para generar un valor de la variable aleatoria $X$ para cualquier valor de $a$ y $b$
+
+El algoritmo que nos permite generar valores para la variable aleatoria $X$ sería
+
+1.  Generar un vector $U \sim U(0,1)$, de largo $N$.
+2.  Evaluar $U$ en la función $X$ según el valor que este tome, considerando los intervalos de la función por partes. Además de darle valores $a$, $b$ a la función para que retorne un valor numérico.
+3.  Almacenar en un vector los resultados para luego poder graficarlos y compararlos con los resultados reales.
+
+### d) Implemente en R el algoritmo descrito en el apartado anterior.
+
+```{r}
+funcion_ppartes <- function(a,b,N){
+  U <- runif(N)
+  vector_respuesta <- NULL
+  for(i in 1:N){
+    if(U[i]<1/2){
+      hx <- 2*a+(b-a)*sqrt(2*U[i])
+      vector_respuesta <- c(vector_respuesta,hx)
+    }else{
+      hx <- 2*b+(a-b)*sqrt(2*(1-U[i]))
+      vector_respuesta <- c(vector_respuesta,hx)
+    }
+  }
+  return(vector_respuesta)
+}
+```
+
+### e) Simule $10^4$ realizaciones de la variable aleatoria $X$, $a = 0$ y $b = 5$. Realice un histograma de la muestra obtenida y superponga la función $f(x)$.
+
+```{r}
+N = 10^4
+a = 0
+b = 5
+
+hx_1 <- function(x){
+  hx <- x/25
+  return(hx)
+  }
+
+hx_2 <- function(x){
+  hx <- (10-x)/25
+  return(hx)
+}
+
+aux <- funcion_ppartes(a,b,N)
+par(bg = "gray70")
+hist(aux, prob = T, main= "Histograma f(x)", col = "forestgreen", xlab = "X")
+curve(hx_1, from=0, to=5, add = TRUE, col = "red", lwd = 3)
+curve(hx_2, from=5, to=10, add = TRUE, col = "red", lwd = 3)
+```
