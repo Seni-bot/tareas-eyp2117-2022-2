@@ -1,0 +1,70 @@
+---
+title: "Tarea 2 EYP2117"
+format: 
+  html: 
+    self-contained: true
+    code-summary: "Código"
+editor: visual
+lang: es
+theme: darkly
+fontsize: 85%
+---
+
+# Pregunta 1
+
+## Considere una función de densidad de la forma:
+
+$$
+f(x) \propto \dfrac{x+2\cdot\sin(x)}{\exp(x)},\quad x\geq 0.
+$$
+
+### a) Grafique la función para $0<x<2$.
+
+
+
+### b) Se quiere generar una variable aleatoria proviniente de $f(x)$ utilizando el método aceptación/rechazo. Proponga una distribución generadora de candidatos y calcule el valor de la constante $c$.
+
+### c) En una sola figura, grafique la función objetivo en color negro, la función generadora de candidatos en color rojo y la función de propuestas multiplicada por la constante $c$, en color verde.
+
+### d) Implemente una función que reciba como argumento el número de variables aleatorias que se desea generar, \$N\$, y retorne un vector con las $N$ variables simuladas, la tasa de aceptación del algoritmo y la constante de normalización de $f(x)$.
+
+### e) Simule $N = 100, 1.000,10.000$ y $20.000$ variables aleatorias desde $f(x)$. Realice una figura que permita comparar la forma del histograma de cada una de las muestras, suponiendo la densidad objetivo.
+
+# Pregunta 2
+
+## Considere una función de densidad formada por la mezcla equiprobable de distribuciones Normales, cada una con los siguientes pares de parámetros: $(\mu_1 = -1, \sigma_1^2 = 1/4), (\mu_2=0,\sigma_2^2=1)$ y $(\mu_3 = 1, \sigma_3^2 = 1/2).$
+
+### a) Realice un gráfico que muestre la función $f(x)$ en color rojo y superponga cada una de las distribuciones que forman la mezcla, en color azul.
+
+### b) Implemente una función que reciba como argumento el número de variables aleatorias que se desea generar, $N$, y retorne las $N$ variables simuladas utilizando el método polar.
+
+### c) Simule muestras de tamaño $N = 100,1.000, 10.000$ y $20.000$ desde $f(x)$ y realice una figura que permita comparar la forma del histograma de cada una de las muestras, superponiendo la densidad objetivo.
+
+### d) Implemente una función que reciba como argumento el número de variables aleatorias que se desea generar, $N$, y retorne las $N$ variables simuladas mediante la transformación de Box-Muller.
+
+### e) Simule muestras de tamaño $N = 100,1.000, 10.000$ y $20.000$ desde $f(x)$ y realice una figura que permita comparar la forma del histograma de cada una de las muestras generadas en el apartado anterior, suponiendo la densidad objetivo.
+
+### f) Comente sus resultados.
+
+# Pregunta 3
+
+## Considere la siguiente función de densidad:
+
+$$
+f(x) = p_1 \cdot f_1(x) + p_2 \cdot f_2(x), \quad x \in \mathbb{R},
+$$ 
+## donde $f_1(x)$ corresponde a una distribución Normal$(4,3)$, $f_2(x)$ a una densidad Gama con parámetros $(shape = 10, rate = 0.7)$ y $(p_1 + p_2) = 1.$
+
+### a) Realice un gráfico con ambas funciones, $f_1(x)$ y $f_2(x)$.
+
+### b) Implemente una función que reciba como argumento el tamaño de la muestra que se desea generar, $N$, y el valor de $p_1$, y retorne la muestra obtenida. En la construcción de esta función, tome en cuenta los siguientes aspectos:
+
+#### (i) La simulación de variables aleatorias Gamma puede realizarse mediante el método de aceptación/rechazo con propuestas provenientes de una distribución Weibull$(shape = 2.5, scale = 13)$.
+
+#### (ii) Las funciones `optimise(...)` y `rweibull(...)` pueden ser de ayuda.
+
+#### (iii) Para la simulación de variables aleatorias normales, pueden utilizar el método de su preferencia.
+
+### c) Simule muestras de tamaño $N = 10^5$ desde $f(x)$ para los casos en que $p_1=0,0.5,1$. Realice una figura que permita comparar los histogramas de las muestras generadas con la función $f(x)$ correspondiente superpuesta al histograma. Comente.
+
+### d) Compare sus resultados con los obtenidos mediante las funciones `rnorm(...)` y `rgamma(...)` incluidas en R, para los mismos valores de $N$ y $p_1$.
