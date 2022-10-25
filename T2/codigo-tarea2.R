@@ -1,7 +1,7 @@
 # Código tarea 2 - EYP2117
 # Maximiliano Medina
 
-# Pregunta 1 ----
+# Pregunta 1 ------------------------------------------------------
 ## a)----
 
 fx <- function(x){
@@ -96,31 +96,28 @@ hist(test_4[[1]], probability = TRUE, breaks = 45, ylim = c(0,1),
 curve(fx(x)*test_4[[3]],lwd = 3,
       add =TRUE, col = "darkmagenta")
 
-# Pregunta 2 ----
+# Pregunta 2 ------------------------------------------------------
 ## a) ----
 
 mezcla <- function(x){
-  mez <- 1/3*dnorm(x, mean = -1, sd = 1/4) +
+  mez <- 1/3*dnorm(x, mean = -1, sd = 1/2) +
     1/3*dnorm(x, mean = 0, sd = 1) +
-    1/3*dnorm(x, mean = 1, sd = 1/2)
+    1/3*dnorm(x, mean = 1, sd = sqrt(1/2))
   return(mez)
 }
 
 par(mfrow =c(1,1))
+
 curve(mezcla(x), from = -10, to = 10, lwd = 2, col = "red", ylim = c(0,1.8))
 
-curve(dnorm(x, mean = -1, sd = 1/4), lwd = 2,lty = 2, add = TRUE, col = "blue")
+curve(dnorm(x, mean = -1, sd = 1/2), lwd = 2,lty = 2, add = TRUE, col = "blue")
 
 curve(dnorm(x, mean = 0, sd = 1), lwd = 2, add = TRUE, col = "blue")
 
-curve(dnorm(x, mean = 1, sd = 1/2), lwd = 2,lty = 2, add = TRUE, col = "blue")
+curve(dnorm(x, mean = 1, sd = sqrt(1/2)), lwd = 2,lty = 2, add = TRUE, col = "blue")
 
 ## b)----
 
-
-
-############### ESTA MALA ESTA WEA #######################
-### PREGUNTAR SI DEBO USAR EL METODO DE LA CLASE / BUSCAR LA PDF DE LA MULTIPLICAICON DE LAS 3 NORMALES
 polar.method <- function(N){
   #Notar que el método polar solo genera para N par
   simulaciones <- c()
@@ -144,34 +141,67 @@ polar.method <- function(N){
   return(simulaciones)
 }
 
+composicion <- function(N){
+  vars <- polar.method(N)
+  comp <- c()
+  for(i in 1:N){
+    U <- runif(1)
+    if(U < 1/3){
+      see <- vars[i]*(1/2)-(-1)
+      comp <- append(comp,see)
+    }
+    if(U>1/3 & U < 2/3){
+      comp <- append(comp, vars[i])
+    }
+    if(U > 2/3){
+      see <- vars[i]*(sqrt(1/2))-(1)
+      comp <- append(comp, see)
+    }
+  }
+  return(comp)
+}
+
 ## c)----
 
 par(mfrow = c(2,2))
 
 N <- 100
-hist(polar.method(N), probability = TRUE, main ="N = 100",
-     xlab = "x", ylab = "Densidad", breaks = 40)
-
+hist(composicion(N), probability = TRUE, main ="N = 100",
+     xlab = "x", ylab = "Densidad", breaks = 40, ylim = c(0,1))
+curve(mezcla, from = -10, to = 10, add = T, col = "red")
 
 N <- 1000
-hist(polar.method(N), probability = TRUE, main ="N = 1000",
-     xlab = "x", ylab = "Densidad", breaks = 40)
+hist(composicion(N), probability = TRUE, main ="N = 1000",
+     xlab = "x", ylab = "Densidad", breaks = 40, ylim = c(0,1))
+curve(mezcla, from = -10, to = 10, add = T, col = "red")
 
 
 N <- 10000
-hist(polar.method(N), probability = TRUE, main ="N = 10000",
-     xlab = "x", ylab = "Densidad", breaks = 40)
+hist(composicion(N), probability = TRUE, main ="N = 10000",
+     xlab = "x", ylab = "Densidad", breaks = 40, ylim = c(0,1))
+curve(mezcla, from = -10, to = 10, add = T, col = "red")
 
 
 N <- 20000
-hist(polar.method(N), probability = TRUE, main ="N = 20000",
-     xlab = "x", ylab = "Densidad", breaks = 40)
+hist(composicion(N), probability = TRUE, main ="N = 20000",
+     xlab = "x", ylab = "Densidad", breaks = 40, ylim = c(0,1))
+curve(mezcla, from = -10, to = 10, add = T, col = "red")
 
 
-###########################################################
+## d)----
 
 
-  # Pregunta 3----
+
+## e)----
+
+
+
+## f)----
+
+
+
+
+# Pregunta 3--------------------------------------------------------
 ## a)----
 
 par(mfrow = c(1,2))
@@ -179,45 +209,50 @@ curve(dnorm(x, mean = 4, sd = 3), from = -10, to = 20, lwd = 2, col = "red")
 curve(dgamma(x, shape = 10, rate = 0.7), from = 0, to = 40, lwd = 2, col = "blue")
 
 ## b)----
-
-func_mez <- function(N, p1){
-  
-  fx <- function(x,a,b){
-    fx <- b^a/gamma(a)*x^(a-1)*exp(-b*x)
-    return(fx)
-  }
-  
-  f_g <- function(x){ #ESTO DE ACA ME DA UNA FUNCION MONOTONA CRECIENTE
-    f_g <- fx(x,10,0.7)/dweibull(x,shape = 2.5, scale = 13)
-    return(f_g)
-  }
-  
-  optim <- optimise(f_g, maximum = TRUE, interval = c(-10,50)) #DEFINIR BIEN EL INTERVALO
-  cc <- optim$objective
-  
-  acep_recha <- function(N){
-    simulaciones <- c()
-    
-    while(length(simulaciones) < N){
-      y <- rweibull(1,shape = 2.5, scale = 13)
-      u <- runif(1)
-      
-      if(u <=(1/cc)*fx(y,10,0.7)/dweibull(y,shape = 2.5, scale = 13)){
-        simulaciones <- append(simulaciones, y)
-      }
-    }
-    return(simulaciones)
-  }#SUPONIENDO QUE ME SALIÓ EL SIMULAR LAS GAMMA
-  
-  sims <- acep_recha(N)
-  
-  fx_x <- p1*rnorm(N, mean = 4, sd = 3) + (1-p1)*sims
-  return(fx_x)
+fx <- function(x){
+  fx <- x^(10-1)*exp(-0.7*x)
+  return(fx)
 }
+
+
+f_g <- function(x){ 
+  f_g <- dgamma(x,shape = 10,rate = 0.7)/dweibull(x,shape = 2.5, scale = 13)
+  return(f_g)
+}
+
+oo <- optimise(function(x){dgamma(x,shape = 10,rate = 0.7)/dweibull(x,shape = 2.5, scale = 13)}, maximum = TRUE, lower = 0,upper = 30)
+
+optim <- optimize(f_g, maximum = TRUE, lower = 0, upper = 100) 
+cc <- optim$objective
+
+### ESPERAR ANUNCIO DE PROFE, PROBABLEMENTE ESTE MALO EL ENUNCIADO, MIENTRAS TRABAJAR CON C(0,30) COMO INTERVALO
+
+simu_gamma <- function(N){
+  aceptados <- 0
+  rechazados <- 0
+  simulaciones <- c()
+  
+  while(length(simulaciones) < N){
+    y <- rweibull(1,shape = 2.5, scale = 13)
+    u <- runif(1)
+    
+    if(u <=(1/cc)*fx(y)/dweibull(y,shape = 2.5, scale = 13)){
+      aceptados <- aceptados + 1
+      simulaciones <- append(simulaciones, y)
+    }else{
+      rechazados <- rechazados + 1
+    }
+  }
+  tasa_aceptacion <- aceptados/(aceptados+rechazados)
+  return(list(simulaciones, tasa_aceptacion))
+}
+
+simu_gamma(10)
+
 
 ## c)----
 par(mfrow=c(2,2))
-N <- 10^5
+N <- 100
 
 p1 <- 0
 caso_1 <- func_mez(N,p1)
@@ -231,5 +266,7 @@ p1 <- 1
 caso_3 <- func_mez(N,p1)
 
 ## d)----
+
+
 
 
