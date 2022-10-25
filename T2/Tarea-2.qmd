@@ -20,15 +20,115 @@ $$
 
 ### a) Grafique la función para $0<x<2$.
 
+```{r}
+## a)----
 
+fx <- function(x){
+  fx <- (x+(2*sin(x)))/(exp(x))
+  return(fx)
+}
+
+curve(fx, from = 0, to = 2, ylim = c(0,1.5),
+      main = "Función f(x)",
+      ylab = "f(x)", xlab = "Valores",
+      lwd = 2)
+```
 
 ### b) Se quiere generar una variable aleatoria proviniente de $f(x)$ utilizando el método aceptación/rechazo. Proponga una distribución generadora de candidatos y calcule el valor de la constante $c$.
 
+```{r}
+# Proponemos una densidad gamma con shape = 2
+
+f_g <- function(x){
+  f_g <- fx(x)/dgamma(x, shape = 2)
+  return(f_g)
+}
+
+optim <- optimise(f_g, maximum = TRUE, interval = c(0,2))
+(cc <- optim$objective)
+```
+
 ### c) En una sola figura, grafique la función objetivo en color negro, la función generadora de candidatos en color rojo y la función de propuestas multiplicada por la constante $c$, en color verde.
+
+```{r}
+## c)----
+curve(fx, from = 0, to = 10, lwd = 2, ylim = c(0,1.5), ylab = "" )
+
+curve(dgamma(x,shape = 2), from = 0, to = 10,lwd = 2,
+      add =TRUE, col = "red")
+
+curve(cc*dgamma(x,shape = 2), from = 0, to = 10,lwd = 2,
+      add =TRUE, col = "green")
+
+```
 
 ### d) Implemente una función que reciba como argumento el número de variables aleatorias que se desea generar, \$N\$, y retorne un vector con las $N$ variables simuladas, la tasa de aceptación del algoritmo y la constante de normalización de $f(x)$.
 
+```{r}
+## d)----
+acep_rech <- function(n){
+  aceptados <- 0
+  rechazados <- 0
+  simulaciones <- c()
+  
+  while(length(simulaciones) < n){
+    y <- rgamma(1, shape = 2)
+    u <- runif(1)
+    
+    if(u <=(1/cc)*fx(y)/dgamma(y, shape = 2)){
+      aceptados <- aceptados + 1
+      simulaciones <- append(simulaciones, y)
+    }else{
+      rechazados <- rechazados +1
+    }
+  }
+  tasa_acep <- aceptados/(aceptados + rechazados)
+  
+  const_norm <- 1/(cc*tasa_acep)
+  
+  return(list(simulaciones,tasa_acep,const_norm))
+}
+```
+
 ### e) Simule $N = 100, 1.000,10.000$ y $20.000$ variables aleatorias desde $f(x)$. Realice una figura que permita comparar la forma del histograma de cada una de las muestras, suponiendo la densidad objetivo.
+
+```{r}
+## e)----
+
+par(mfrow = c(2,2))
+
+N <- 100
+test_1 <- acep_rech(N)
+hist(test_1[[1]], probability = TRUE, breaks = 40, ylim = c(0,1),
+     ylab = "Densidad", xlab = "Simulaciones",
+     main = "N = 100")
+curve(fx(x)*test_1[[3]],lwd = 3,
+      add =TRUE, col = "blue")
+
+N <- 1000
+test_2 <- acep_rech(N)
+hist(test_2[[1]], probability = TRUE, breaks = 40, ylim = c(0,1),
+     ylab = "Densidad", xlab = "Simulaciones",
+     main = "N = 1000")
+curve(fx(x)*test_2[[3]],lwd = 3,
+      add =TRUE, col = "red")
+
+N <- 10000
+test_3 <- acep_rech(N)
+hist(test_3[[1]], probability = TRUE, breaks = 40, ylim = c(0,1),
+     ylab = "Densidad", xlab = "Simulaciones",
+     main = "N = 10000")
+curve(fx(x)*test_3[[3]],lwd = 3,
+      add =TRUE, col = "green")
+
+N <- 20000
+test_4 <- acep_rech(N)
+hist(test_4[[1]], probability = TRUE, breaks = 45, ylim = c(0,1),
+     ylab = "Densidad", xlab = "Simulaciones",
+     main = "N = 20000")
+curve(fx(x)*test_4[[3]],lwd = 3,
+      add =TRUE, col = "darkmagenta")
+```
 
 # Pregunta 2
 
@@ -36,13 +136,176 @@ $$
 
 ### a) Realice un gráfico que muestre la función $f(x)$ en color rojo y superponga cada una de las distribuciones que forman la mezcla, en color azul.
 
+```{r}
+## a) ----
+
+mezcla <- function(x){
+  mez <- 1/3*dnorm(x, mean = -1, sd = 1/2) +
+    1/3*dnorm(x, mean = 0, sd = 1) +
+    1/3*dnorm(x, mean = 1, sd = sqrt(1/2))
+  return(mez)
+}
+
+par(mfrow =c(1,1))
+
+curve(mezcla(x), from = -10, to = 10, lwd = 2, col = "red", ylim = c(0,1.8))
+
+curve(dnorm(x, mean = -1, sd = 1/2), lwd = 2,lty = 2, add = TRUE, col = "blue")
+
+curve(dnorm(x, mean = 0, sd = 1), lwd = 2, lty = 2, add = TRUE, col = "blue")
+
+curve(dnorm(x, mean = 1, sd = sqrt(1/2)), lwd = 2,lty = 2, add = TRUE, col = "blue")
+```
+
 ### b) Implemente una función que reciba como argumento el número de variables aleatorias que se desea generar, $N$, y retorne las $N$ variables simuladas utilizando el método polar.
+
+```{r}
+## b)----
+
+polar.method <- function(N){
+  #Notar que el método polar solo genera para N par
+  simulaciones <- c()
+  while(length(simulaciones) < N){
+    U1 <- runif(1)
+    U2 <- runif(1)
+    
+    v1 <- 2*U1-1
+    v2 <- 2*U2-1
+    
+    s <- v1^2+v2^2
+    
+    if(s<=1){
+      X <- v1*(-2*log(s)/s)^{1/2}
+      Y <- v2*(-2*log(s)/s)^{1/2}
+      
+      simulaciones <- append(simulaciones, c(X,Y))
+      
+    }
+  }
+  return(simulaciones)
+}
+
+composicion <- function(N){
+  vars <- polar.method(N)
+  comp <- c()
+  for(i in 1:N){
+    U <- runif(1)
+    if(U < 1/3){
+      see <- vars[i]*(1/2)-(-1)
+      comp <- append(comp,see)
+    }
+    if(U>1/3 & U < 2/3){
+      comp <- append(comp, vars[i])
+    }
+    if(U > 2/3){
+      see <- vars[i]*(sqrt(1/2))-(1)
+      comp <- append(comp, see)
+    }
+  }
+  return(comp)
+}
+```
 
 ### c) Simule muestras de tamaño $N = 100,1.000, 10.000$ y $20.000$ desde $f(x)$ y realice una figura que permita comparar la forma del histograma de cada una de las muestras, superponiendo la densidad objetivo.
 
+```{r}
+## c)----
+
+par(mfrow = c(2,2))
+
+N <- 100
+hist(composicion(N), probability = TRUE, main ="N = 100",
+     xlab = "x", ylab = "Densidad", breaks = 40, ylim = c(0,1))
+curve(mezcla, from = -10, to = 10, add = T, col = "red")
+
+N <- 1000
+hist(composicion(N), probability = TRUE, main ="N = 1000",
+     xlab = "x", ylab = "Densidad", breaks = 40, ylim = c(0,1))
+curve(mezcla, from = -10, to = 10, add = T, col = "red")
+
+
+N <- 10000
+hist(composicion(N), probability = TRUE, main ="N = 10000",
+     xlab = "x", ylab = "Densidad", breaks = 40, ylim = c(0,1))
+curve(mezcla, from = -10, to = 10, add = T, col = "red")
+
+
+N <- 20000
+hist(composicion(N), probability = TRUE, main ="N = 20000",
+     xlab = "x", ylab = "Densidad", breaks = 40, ylim = c(0,1))
+curve(mezcla, from = -10, to = 10, add = T, col = "red")
+```
+
 ### d) Implemente una función que reciba como argumento el número de variables aleatorias que se desea generar, $N$, y retorne las $N$ variables simuladas mediante la transformación de Box-Muller.
 
+```{r}
+## d)----
+
+box.muller <- function(N){
+  sims <- c()
+  for(i in 1:N){
+    U <- runif(1)
+    V <- runif(1)
+    
+    X <- sqrt(-2*log(1-U))*cos(2*pi*V)
+    Y <- sqrt(-2*log(1-U))*sin(2*pi*V)
+    
+    sims <- c(sims,c(X,Y))
+  }
+  return(sims)
+}
+
+composicion <- function(N){
+  vars <- box.muller(N)
+  comp <- c()
+  for(i in 1:N){
+    U <- runif(1)
+    if(U < 1/3){
+      see <- vars[i]*(1/2)-(-1)
+      comp <- append(comp,see)
+    }
+    if(U>1/3 & U < 2/3){
+      comp <- append(comp, vars[i])
+    }
+    if(U > 2/3){
+      see <- vars[i]*(sqrt(1/2))-(1)
+      comp <- append(comp, see)
+    }
+  }
+  return(comp)
+}
+```
+
 ### e) Simule muestras de tamaño $N = 100,1.000, 10.000$ y $20.000$ desde $f(x)$ y realice una figura que permita comparar la forma del histograma de cada una de las muestras generadas en el apartado anterior, suponiendo la densidad objetivo.
+
+```{r}
+## e)----
+
+par(mfrow = c(2,2))
+
+N <- 100
+hist(composicion(N), probability = TRUE, main ="N = 100",
+     xlab = "x", ylab = "Densidad", breaks = 40, ylim = c(0,1))
+curve(mezcla, from = -10, to = 10, add = T, col = "red")
+
+N <- 1000
+hist(composicion(N), probability = TRUE, main ="N = 1000",
+     xlab = "x", ylab = "Densidad", breaks = 40, ylim = c(0,1))
+curve(mezcla, from = -10, to = 10, add = T, col = "red")
+
+
+N <- 10000
+hist(composicion(N), probability = TRUE, main ="N = 10000",
+     xlab = "x", ylab = "Densidad", breaks = 40, ylim = c(0,1))
+curve(mezcla, from = -10, to = 10, add = T, col = "red")
+
+
+N <- 20000
+hist(composicion(N), probability = TRUE, main ="N = 20000",
+     xlab = "x", ylab = "Densidad", breaks = 40, ylim = c(0,1))
+curve(mezcla, from = -10, to = 10, add = T, col = "red")
+
+```
 
 ### f) Comente sus resultados.
 
@@ -52,8 +315,7 @@ $$
 
 $$
 f(x) = p_1 \cdot f_1(x) + p_2 \cdot f_2(x), \quad x \in \mathbb{R},
-$$ 
-## donde $f_1(x)$ corresponde a una distribución Normal$(4,3)$, $f_2(x)$ a una densidad Gama con parámetros $(shape = 10, rate = 0.7)$ y $(p_1 + p_2) = 1.$
+$$ \## donde $f_1(x)$ corresponde a una distribución Normal$(4,3)$, $f_2(x)$ a una densidad Gama con parámetros $(shape = 10, rate = 0.7)$ y $(p_1 + p_2) = 1.$
 
 ### a) Realice un gráfico con ambas funciones, $f_1(x)$ y $f_2(x)$.
 

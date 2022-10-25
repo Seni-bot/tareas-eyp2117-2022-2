@@ -22,7 +22,7 @@ f_g <- function(x){
 }
 
 optim <- optimise(f_g, maximum = TRUE, interval = c(0,2))
-(cc <- optim$objective) #PREGUNTAR SI SE SACA C ASÍ O EN PAPEL
+(cc <- optim$objective) 
 
 
 ## c)----
@@ -112,7 +112,7 @@ curve(mezcla(x), from = -10, to = 10, lwd = 2, col = "red", ylim = c(0,1.8))
 
 curve(dnorm(x, mean = -1, sd = 1/2), lwd = 2,lty = 2, add = TRUE, col = "blue")
 
-curve(dnorm(x, mean = 0, sd = 1), lwd = 2, add = TRUE, col = "blue")
+curve(dnorm(x, mean = 0, sd = 1), lwd = 2, lty = 2, add = TRUE, col = "blue")
 
 curve(dnorm(x, mean = 1, sd = sqrt(1/2)), lwd = 2,lty = 2, add = TRUE, col = "blue")
 
@@ -190,15 +190,71 @@ curve(mezcla, from = -10, to = 10, add = T, col = "red")
 
 ## d)----
 
+box.muller <- function(N){
+  sims <- c()
+  for(i in 1:N){
+    U <- runif(1)
+    V <- runif(1)
+    
+    X <- sqrt(-2*log(1-U))*cos(2*pi*V)
+    Y <- sqrt(-2*log(1-U))*sin(2*pi*V)
+    
+    sims <- c(sims,c(X,Y))
+  }
+  return(sims)
+}
 
+composicion <- function(N){
+  vars <- box.muller(N)
+  comp <- c()
+  for(i in 1:N){
+    U <- runif(1)
+    if(U < 1/3){
+      see <- vars[i]*(1/2)-(-1)
+      comp <- append(comp,see)
+    }
+    if(U>1/3 & U < 2/3){
+      comp <- append(comp, vars[i])
+    }
+    if(U > 2/3){
+      see <- vars[i]*(sqrt(1/2))-(1)
+      comp <- append(comp, see)
+    }
+  }
+  return(comp)
+}
 
 ## e)----
+
+par(mfrow = c(2,2))
+
+N <- 100
+hist(composicion(N), probability = TRUE, main ="N = 100",
+     xlab = "x", ylab = "Densidad", breaks = 40, ylim = c(0,1))
+curve(mezcla, from = -10, to = 10, add = T, col = "red")
+
+N <- 1000
+hist(composicion(N), probability = TRUE, main ="N = 1000",
+     xlab = "x", ylab = "Densidad", breaks = 40, ylim = c(0,1))
+curve(mezcla, from = -10, to = 10, add = T, col = "red")
+
+
+N <- 10000
+hist(composicion(N), probability = TRUE, main ="N = 10000",
+     xlab = "x", ylab = "Densidad", breaks = 40, ylim = c(0,1))
+curve(mezcla, from = -10, to = 10, add = T, col = "red")
+
+
+N <- 20000
+hist(composicion(N), probability = TRUE, main ="N = 20000",
+     xlab = "x", ylab = "Densidad", breaks = 40, ylim = c(0,1))
+curve(mezcla, from = -10, to = 10, add = T, col = "red")
 
 
 
 ## f)----
 
-
+#En quarto
 
 
 # Pregunta 3--------------------------------------------------------
