@@ -22,8 +22,8 @@ f_g <- function(x){
 }
 
 optim <- optimise(f_g, maximum = TRUE, interval = c(0,2))
-(cc <- optim$objective) 
-
+cc <- optim$objective
+print(paste("El valor c para f(x) es",round(cc)))
 
 ## c)----
 curve(fx, from = 0, to = 10, lwd = 2, ylim = c(0,1.5), ylab = "" )
@@ -261,11 +261,17 @@ curve(mezcla, from = -10, to = 10, add = T, col = "red")
 # Pregunta 3--------------------------------------------------------
 ## a)----
 
-par(mfrow = c(1,2))
-curve(dnorm(x, mean = 4, sd = 3), from = -10, to = 20, lwd = 2, col = "red",
-      main = "Normal(4,3)", ylab = "Densidad")
-curve(dgamma(x, shape = 10, rate = 0.7), from = 0, to = 40, lwd = 2, col = "blue",
-      main = "Gama(shape = 10, rate = 0.7)", ylab = "Densidad")
+par(mfrow = c(1,1))
+curve(dnorm(x, mean = 4, sd = 3), from = -10, to = 40, lwd = 2, col = "red",
+      main = "Normal(4,3) y Gama(shape = 10, rate = 0.7)", ylab = "Densidad")
+curve(dgamma(x, shape = 10, rate = 0.7),from = -10, to = 40, lwd = 2, col = "blue",
+      add = TRUE)
+legend(x = "topright",
+       inset = .02,
+       lty = c(1,1), 
+       col= c("red","blue"), 
+       legend=c("Normal", "Gama"),
+       cex = 0.8)
 
 ## b)----
 
@@ -319,8 +325,9 @@ par(mfrow = c(2,2))
 N <- 10^5
 
 ################# Para p1 = 0 #################
-p1 <- 0
-hist(compos(N, p1),
+p1_1 <- 0
+aux1 <- compos(N, p1_1)
+hist(aux1,
      probability = TRUE,
      main = "N = 10^5, p1 = 0",
      breaks = 50,
@@ -338,16 +345,18 @@ curve(fx, add = TRUE, lwd = 2, col = "red")
 
 ################# Para p1 = 0.5 ##############
 
-p1 <- 0.5
-hist(compos(N, p1),
+p1_2 <- 0.5
+aux2 <-compos(N, p1_2)
+hist(aux2,
      probability = TRUE,
      main = "N = 10^5, p1 = 0.5",
-     breaks = 50,
      ylim = c(0,0.2),
+     breaks = 30,
      xlab = "X")
 
 fx <- function(x){
-  fx <- 0.5 * dnorm(x, mean = 4, sd = sqrt(3)) + 0.5 * dgamma(x, shape = 10, rate = 0.7)
+  fx <- 1/2 * dnorm(x, mean = 4, sd = sqrt(3)) +
+    1/2 * dgamma(x, shape = 10, rate = 0.7)
   return(fx)
 }
 
@@ -358,8 +367,9 @@ curve(fx, add = TRUE, lwd = 2, col = "red")
 
 ################# Para p1 = 1 ################
 
-p1 <- 1
-hist(compos(N, p1),
+p1_3 <- 1
+aux3 <- compos(N, p1_3)
+hist(aux3,
      probability = TRUE,
      main = "N = 10^5, p1 = 1",
      breaks = 50,
@@ -377,10 +387,89 @@ curve(fx, add = TRUE, lwd = 2, col = "red")
 
 ## d)----
 
-# pensar el como comparar los resultados
-# idea: grafico - tabla con media, desv, etc.
+############### Para p1 = 0 ###################
 
+# valores simulados
+simu <- aux1
+comparativa_1a <- list(tipo = "simulada",
+                       media = mean(simu),
+                       desv. = sd(simu),
+                       varianza = var(simu))
 
+# valores "reales"
+
+real <- rgamma(N, shape = 10, rate = 0.7)
+comparativa_1b <- list(tipo = "real",
+                       media = mean(real),
+                       desv. = sd(real),
+                       varianza = var(real))
+
+df <- data.frame(tipo = c(),
+                 media = c(),
+                 desv. = c(),
+                 varianza = c())
+
+df <- rbind(df, comparativa_1a)
+df <- rbind(df, comparativa_1b)
+df
+
+###############################################
+
+############### Para p1 = 0.5 #################
+
+# valores simulados
+simu <- aux2
+comparativa_2a <- list(tipo = "simulada",
+                       media = mean(simu),
+                       desv. = sd(simu),
+                       varianza = var(simu))
+
+# valores "reales"
+
+real <- 0.5 * rnorm(N, mean = 4, sd = sqrt(3)) + 0.5*rgamma(N, shape = 10, rate = 0.7)
+comparativa_2b <- list(tipo = "real",
+                       media = mean(real),
+                       desv. = sd(real),
+                       varianza = var(real))
+
+df <- data.frame(tipo = c(),
+                 media = c(),
+                 desv. = c(),
+                 varianza = c())
+
+df <- rbind(df, comparativa_2a)
+df <- rbind(df, comparativa_2b)
+df
+
+###############################################
+
+############### Para p1 = 1 ###################
+
+# valores simulados
+simu <- aux3
+comparativa_3a <- list(tipo = "simulada",
+                       media = mean(simu),
+                       desv. = sd(simu),
+                       varianza = var(simu))
+
+# valores "reales"
+
+real <- rnorm(N, mean = 4, sd = sqrt(3))
+comparativa_3b <- list(tipo = "real",
+                       media = mean(real),
+                       desv. = sd(real),
+                       varianza = var(real))
+
+df <- data.frame(tipo = c(),
+                 media = c(),
+                 desv. = c(),
+                 varianza = c())
+
+df <- rbind(df, comparativa_3a)
+df <- rbind(df, comparativa_3b)
+df
+
+###############################################
 
 
 

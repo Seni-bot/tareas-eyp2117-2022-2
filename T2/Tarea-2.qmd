@@ -6,12 +6,13 @@ format:
     code-summary: "Código"
 editor: visual
 lang: es
-theme: darkly
+theme: superhero
 fontsize: 85%
-css: styles.css
 ---
 
-# Pregunta 1
+::: {style="text-align: center"}
+# [Pregunta 1]{.underline}
+:::
 
 ## Considere una función de densidad de la forma:
 
@@ -38,6 +39,7 @@ curve(fx, from = 0, to = 2, ylim = c(0,1.5),
 ### b) Se quiere generar una variable aleatoria proviniente de $f(x)$ utilizando el método aceptación/rechazo. Proponga una distribución generadora de candidatos y calcule el valor de la constante $c$.
 
 ```{r}
+## b)----
 # Proponemos una densidad gamma con shape = 2
 
 f_g <- function(x){
@@ -46,7 +48,8 @@ f_g <- function(x){
 }
 
 optim <- optimise(f_g, maximum = TRUE, interval = c(0,2))
-(cc <- optim$objective)
+cc <- optim$objective
+print(paste("El valor c para f(x) es",round(cc)))
 ```
 
 ### c) En una sola figura, grafique la función objetivo en color negro, la función generadora de candidatos en color rojo y la función de propuestas multiplicada por la constante $c$, en color verde.
@@ -131,7 +134,9 @@ curve(fx(x)*test_4[[3]],lwd = 3,
       add =TRUE, col = "darkmagenta")
 ```
 
-# Pregunta 2
+::: {style="text-align: center"}
+# [Pregunta 2]{.underline}
+:::
 
 ## Considere una función de densidad formada por la mezcla equiprobable de distribuciones Normales, cada una con los siguientes pares de parámetros: $(\mu_1 = -1, \sigma_1^2 = 1/4), (\mu_2=0,\sigma_2^2=1)$ y $(\mu_3 = 1, \sigma_3^2 = 1/2).$
 
@@ -314,9 +319,11 @@ curve(mezcla, from = -10, to = 10, add = T, col = "red")
 
 Podemos ver que tanto con el Método Polar que con el Método de Box - Muller, realizan una buena aproximación a lo que sería la composición de las tres distribuciones normales. Esto se puede ver de manera detallada en los gráficos mostrados anteriormente.
 
-Otra cosa que podemos apreciar es que a medida que aumentamos el valor de $N$, las simulaciones se acercan más a la forma real de $f(x)$. 
+Otra cosa que podemos apreciar es que a medida que aumentamos el valor de $N$, las simulaciones se acercan más a la forma real de $f(x)$.
 
-# Pregunta 3
+::: {style="text-align: center"}
+# [Pregunta 3]{.underline}
+:::
 
 ## Considere la siguiente función de densidad:
 
@@ -331,14 +338,20 @@ $$
 ```{r}
 ## a)----
 
-par(mfrow = c(1,2))
-curve(dnorm(x, mean = 4, sd = 3), from = -10, to = 20, lwd = 2, col = "red",
-      main = "Normal(4,3)", ylab = "Densidad")
-curve(dgamma(x, shape = 10, rate = 0.7), from = 0, to = 40, lwd = 2, col = "blue",
-      main = "Gama(shape = 10, rate = 0.7)", ylab = "Densidad")
+par(mfrow = c(1,1))
+curve(dnorm(x, mean = 4, sd = 3), from = -10, to = 40, lwd = 2, col = "red",
+      main = "Normal(4,3) y Gama(shape = 10, rate = 0.7)", ylab = "Densidad")
+curve(dgamma(x, shape = 10, rate = 0.7),from = -10, to = 40, lwd = 2, col = "blue",
+      add = TRUE)
+legend(x = "topright",
+       inset = .02,
+       lty = c(1,1), 
+       col= c("red","blue"), 
+       legend=c("Normal", "Gama"),
+       cex = 0.8)
 ```
 
-### b) Implemente una función que reciba como argumento el tamaño de la muestra que se desea generar, $N$, y el valor de $p_1$, y retorne la muestra obtenida. 
+### b) Implemente una función que reciba como argumento el tamaño de la muestra que se desea generar, $N$, y el valor de $p_1$, y retorne la muestra obtenida.
 
 ```{r}
 ## b)----
@@ -397,8 +410,9 @@ par(mfrow = c(2,2))
 N <- 10^5
 
 ################# Para p1 = 0 #################
-p1 <- 0
-hist(compos(N, p1),
+p1_1 <- 0
+aux1 <- compos(N, p1_1)
+hist(aux1,
      probability = TRUE,
      main = "N = 10^5, p1 = 0",
      breaks = 50,
@@ -416,16 +430,18 @@ curve(fx, add = TRUE, lwd = 2, col = "red")
 
 ################# Para p1 = 0.5 ##############
 
-p1 <- 0.5
-hist(compos(N, p1),
+p1_2 <- 0.5
+aux2 <-compos(N, p1_2)
+hist(aux2,
      probability = TRUE,
      main = "N = 10^5, p1 = 0.5",
-     breaks = 50,
      ylim = c(0,0.2),
+     breaks = 30,
      xlab = "X")
 
 fx <- function(x){
-  fx <- 0.5 * dnorm(x, mean = 4, sd = sqrt(3)) + 0.5 * dgamma(x, shape = 10, rate = 0.7)
+  fx <- 1/2 * dnorm(x, mean = 4, sd = sqrt(3)) +
+    1/2 * dgamma(x, shape = 10, rate = 0.7)
   return(fx)
 }
 
@@ -436,8 +452,9 @@ curve(fx, add = TRUE, lwd = 2, col = "red")
 
 ################# Para p1 = 1 ################
 
-p1 <- 1
-hist(compos(N, p1),
+p1_3 <- 1
+aux3 <- compos(N, p1_3)
+hist(aux3,
      probability = TRUE,
      main = "N = 10^5, p1 = 1",
      breaks = 50,
@@ -454,6 +471,91 @@ curve(fx, add = TRUE, lwd = 2, col = "red")
 ##############################################
 ```
 
-Podemos observar que tanto para $p_1 = 0, 0.5, 1$, se cumple que el histograma se asemeja bastante al comportamiento de $f(x)$. Esto se puede explicar dado al buen algoritmo de simulación de variables Normales(4,3), y al de simulacion de variables Gama(shape = 10, rate = 0.7), además de la gran cantidad de simulaciones que estamos obteniendo, en este caso $N = 10^5$.
+Podemos observar que tanto para $p_1 = 0, 1$, se cumple que el histograma se asemeja bastante al comportamiento de $f(x)$. Esto se puede explicar dado al buen algoritmo de simulación de variables Normales(4,3), y al de simulacion de variables Gama(shape = 10, rate = 0.7), además de la gran cantidad de simulaciones que estamos obteniendo, en este caso $N = 10^5$.
+Por otra parte, para $p_1 = 0.5$, notamos que el histograma no se asemeja tan bien a la curva idónea $f(x)$. Más adelante (item 3.d) se explicará el por qué de este fenomeno.
 
 ### d) Compare sus resultados con los obtenidos mediante las funciones `rnorm(...)` y `rgamma(...)` incluidas en R, para los mismos valores de $N$ y $p_1$.
+
+```{r}
+## d)----
+
+############### Para p1 = 0 ###################
+
+# valores simulados
+simu <- aux1
+comparativa_1a <- list(tipo = "simulada",
+                       media = mean(simu),
+                       desv. = sd(simu),
+                       varianza = var(simu))
+
+# valores "reales"
+
+real <- rgamma(N, shape = 10, rate = 0.7)
+comparativa_1b <- list(tipo = "real",
+                       media = mean(real),
+                       desv. = sd(real),
+                       varianza = var(real))
+
+df <- data.frame(tipo = c(),
+                 media = c(),
+                 desv. = c(),
+                 varianza = c())
+
+df <- rbind(df, comparativa_1a)
+df <- rbind(df, comparativa_1b)
+df
+
+############### Para p1 = 0.5 #################
+
+# valores simulados
+simu <- aux2
+comparativa_2a <- list(tipo = "simulada",
+                       media = mean(simu),
+                       desv. = sd(simu),
+                       varianza = var(simu))
+
+# valores "reales"
+
+real <- 0.5 * rnorm(N, mean = 4, sd = sqrt(3)) + 0.5*rgamma(N, shape = 10, rate = 0.7)
+comparativa_2b <- list(tipo = "real",
+                       media = mean(real),
+                       desv. = sd(real),
+                       varianza = var(real))
+
+df <- data.frame(tipo = c(),
+                 media = c(),
+                 desv. = c(),
+                 varianza = c())
+
+df <- rbind(df, comparativa_2a)
+df <- rbind(df, comparativa_2b)
+df
+
+############### Para p1 = 1 ###################
+
+# valores simulados
+simu <- aux3
+comparativa_3a <- list(tipo = "simulada",
+                       media = mean(simu),
+                       desv. = sd(simu),
+                       varianza = var(simu))
+
+# valores "reales"
+
+real <- rnorm(N, mean = 4, sd = sqrt(3))
+comparativa_3b <- list(tipo = "real",
+                       media = mean(real),
+                       desv. = sd(real),
+                       varianza = var(real))
+
+df <- data.frame(tipo = c(),
+                 media = c(),
+                 desv. = c(),
+                 varianza = c())
+
+df <- rbind(df, comparativa_3a)
+df <- rbind(df, comparativa_3b)
+df
+```
+
+Podemos apreciar que para $p_1 = 0$ y $p_1 = 1$, las medias($\mu$), desviaciones estándar($\sigma$) y varianzas($\sigma^2$) son bastante similares, sin embargo cuando $p_1 = 0.5$, notamos una gran variación en las 3 medidas. Esto se puede explicar debido a que cuando calculamos $\frac{f(x)}{g(x)}$ para encontrar $c$, el resultado de esta división es una función monotona creciente, es decir, no tiene un máximo global. Por lo que el valor de $c$ variará dependiendo del intervalo en donde se quiera encontrar el máximo.
