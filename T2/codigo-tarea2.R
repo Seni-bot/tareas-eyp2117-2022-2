@@ -119,7 +119,7 @@ curve(dnorm(x, mean = 1, sd = sqrt(1/2)), lwd = 2,lty = 2, add = TRUE, col = "bl
 ## b)----
 
 polar.method <- function(N){
-  #Notar que el método polar solo genera para N par
+  
   simulaciones <- c()
   while(length(simulaciones) < N){
     U1 <- runif(1)
@@ -131,10 +131,10 @@ polar.method <- function(N){
     s <- v1^2+v2^2
     
     if(s<=1){
-      X <- v1*(-2*log(s)/s)^{1/2}
-      Y <- v2*(-2*log(s)/s)^{1/2}
       
-      simulaciones <- append(simulaciones, c(X,Y))
+      X <- v1*(-2*log(s)/s)^{1/2}
+      
+      simulaciones <- append(simulaciones, X)
       
     }
   }
@@ -147,14 +147,14 @@ composicion <- function(N){
   for(i in 1:N){
     U <- runif(1)
     if(U < 1/3){
-      see <- vars[i]*(1/2)-(-1)
+      see <- vars[i]*(1/2)+(-1)
       comp <- append(comp,see)
     }
     if(U>1/3 & U < 2/3){
       comp <- append(comp, vars[i])
     }
     if(U > 2/3){
-      see <- vars[i]*(sqrt(1/2))-(1)
+      see <- vars[i]*(sqrt(1/2))+(1)
       comp <- append(comp, see)
     }
   }
@@ -192,15 +192,16 @@ curve(mezcla, from = -10, to = 10, add = T, col = "red")
 
 box.muller <- function(N){
   sims <- c()
-  for(i in 1:N){
+  
+  while(length(sims) < N){
     U <- runif(1)
     V <- runif(1)
     
     X <- sqrt(-2*log(1-U))*cos(2*pi*V)
-    Y <- sqrt(-2*log(1-U))*sin(2*pi*V)
     
-    sims <- c(sims,c(X,Y))
+    sims <- c(sims,X)
   }
+
   return(sims)
 }
 
@@ -210,14 +211,14 @@ composicion <- function(N){
   for(i in 1:N){
     U <- runif(1)
     if(U < 1/3){
-      see <- vars[i]*(1/2)-(-1)
+      see <- vars[i]*(sqrt(1/4))+(-1)
       comp <- append(comp,see)
     }
     if(U>1/3 & U < 2/3){
       comp <- append(comp, vars[i])
     }
     if(U > 2/3){
-      see <- vars[i]*(sqrt(1/2))-(1)
+      see <- vars[i]*(sqrt(1/2))+(1)
       comp <- append(comp, see)
     }
   }
@@ -254,74 +255,140 @@ curve(mezcla, from = -10, to = 10, add = T, col = "red")
 
 ## f)----
 
-#En quarto
+# En quarto
 
 
 # Pregunta 3--------------------------------------------------------
 ## a)----
 
 par(mfrow = c(1,2))
-curve(dnorm(x, mean = 4, sd = 3), from = -10, to = 20, lwd = 2, col = "red")
-curve(dgamma(x, shape = 10, rate = 0.7), from = 0, to = 40, lwd = 2, col = "blue")
+curve(dnorm(x, mean = 4, sd = 3), from = -10, to = 20, lwd = 2, col = "red",
+      main = "Normal(4,3)", ylab = "Densidad")
+curve(dgamma(x, shape = 10, rate = 0.7), from = 0, to = 40, lwd = 2, col = "blue",
+      main = "Gama(shape = 10, rate = 0.7)", ylab = "Densidad")
 
 ## b)----
+
 fx <- function(x){
-  fx <- x^(10-1)*exp(-0.7*x)
+  fx <- (((0.7)^10)/gamma(10))*x^(10-1)*exp(-0.7*x)
   return(fx)
 }
 
-
-f_g <- function(x){ 
-  f_g <- dgamma(x,shape = 10,rate = 0.7)/dweibull(x,shape = 2.5, scale = 13)
+f_g <- function(x){
+  f_g <- fx(x)/dweibull(x, shape = 2.5, scale = 13)
   return(f_g)
 }
 
-oo <- optimise(function(x){dgamma(x,shape = 10,rate = 0.7)/dweibull(x,shape = 2.5, scale = 13)}, maximum = TRUE, lower = 0,upper = 30)
+c <- optimise(f_g, maximum = TRUE, interval = c(0,30))$objective
 
-optim <- optimize(f_g, maximum = TRUE, lower = 0, upper = 100) 
-cc <- optim$objective
 
-### ESPERAR ANUNCIO DE PROFE, PROBABLEMENTE ESTE MALO EL ENUNCIADO, MIENTRAS TRABAJAR CON C(0,30) COMO INTERVALO
-
-simu_gamma <- function(N){
-  aceptados <- 0
-  rechazados <- 0
+simu.gamma <- function(N){
   simulaciones <- c()
   
   while(length(simulaciones) < N){
-    y <- rweibull(1,shape = 2.5, scale = 13)
-    u <- runif(1)
+    U <- runif(1)
+    y <- rweibull(1, shape = 2.5, scale = 13)
     
-    if(u <=(1/cc)*fx(y)/dweibull(y,shape = 2.5, scale = 13)){
-      aceptados <- aceptados + 1
+    if(U <= (1/c)*fx(y)/dweibull(y,shape = 2.5, scale = 13)){
       simulaciones <- append(simulaciones, y)
-    }else{
-      rechazados <- rechazados + 1
     }
   }
-  tasa_aceptacion <- aceptados/(aceptados+rechazados)
-  return(list(simulaciones, tasa_aceptacion))
+  return(simulaciones)
 }
 
-simu_gamma(10)
+# Para simular normales usaré el método polar (función polar.method(N))
 
+compos <- function(N, p1){
+  simu <- c()
+  for(i in 1:N){
+    U <- runif(1)
+    
+    if(U < p1){
+      ans <- polar.method(1)
+      ans <- (ans * sqrt(3)) + 4 # "Des-estandarizamos" la muestra N(0,1) a N(4,3)
+      simu <- append(simu,ans)
+    }else{
+      simu <- append(simu, simu.gamma(1))
+    }
+  }
+  return(simu)
+}
 
-## c)----
-par(mfrow=c(2,2))
-N <- 100
+## c) ----
+par(mfrow = c(2,2))
+N <- 10^5
 
+################# Para p1 = 0 #################
 p1 <- 0
-caso_1 <- func_mez(N,p1)
-hist(caso_1)# ver bien el dominio
-curve()# ACA VA LA GAMMA MULTIPLICADA POR M, QUE TENGO QUE CALCULARLO XLAXUXA
+hist(compos(N, p1),
+     probability = TRUE,
+     main = "N = 10^5, p1 = 0",
+     breaks = 50,
+     ylim = c(0,0.15),
+     xlab = "X")
+
+fx <- function(x){
+  fx <- dgamma(x, shape = 10, rate = 0.7)
+  return(fx)
+}
+
+curve(fx, add = TRUE, lwd = 2, col = "red")
+
+##############################################
+
+################# Para p1 = 0.5 ##############
 
 p1 <- 0.5
-caso_2 <- func_mez(N,p1)
+hist(compos(N, p1),
+     probability = TRUE,
+     main = "N = 10^5, p1 = 0.5",
+     breaks = 50,
+     ylim = c(0,0.2),
+     xlab = "X")
+
+fx <- function(x){
+  fx <- 0.5 * dnorm(x, mean = 4, sd = sqrt(3)) + 0.5 * dgamma(x, shape = 10, rate = 0.7)
+  return(fx)
+}
+
+curve(fx, add = TRUE, lwd = 2, col = "red")
+
+##############################################
+
+
+################# Para p1 = 1 ################
 
 p1 <- 1
-caso_3 <- func_mez(N,p1)
+hist(compos(N, p1),
+     probability = TRUE,
+     main = "N = 10^5, p1 = 1",
+     breaks = 50,
+     ylim = c(0,0.25),
+     xlab = "X")
+
+fx <- function(x){
+  fx <- dnorm(x, mean = 4, sd = sqrt(3)) 
+  return(fx)
+}
+
+curve(fx, add = TRUE, lwd = 2, col = "red")
+
+##############################################
 
 ## d)----
+
+# pensar el como comparar los resultados
+# idea: grafico - tabla con media, desv, etc.
+
+
+
+
+
+
+
+
+
+
 
 
 
