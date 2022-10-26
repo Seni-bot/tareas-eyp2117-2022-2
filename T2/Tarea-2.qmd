@@ -169,7 +169,7 @@ curve(dnorm(x, mean = 1, sd = sqrt(1/2)), lwd = 2,lty = 2, add = TRUE, col = "bl
 ## b)----
 
 polar.method <- function(N){
-  #Notar que el método polar solo genera para N par
+  
   simulaciones <- c()
   while(length(simulaciones) < N){
     U1 <- runif(1)
@@ -181,10 +181,10 @@ polar.method <- function(N){
     s <- v1^2+v2^2
     
     if(s<=1){
-      X <- v1*(-2*log(s)/s)^{1/2}
-      Y <- v2*(-2*log(s)/s)^{1/2}
       
-      simulaciones <- append(simulaciones, c(X,Y))
+      X <- v1*(-2*log(s)/s)^{1/2}
+      
+      simulaciones <- append(simulaciones, X)
       
     }
   }
@@ -255,9 +255,8 @@ box.muller <- function(N){
     V <- runif(1)
     
     X <- sqrt(-2*log(1-U))*cos(2*pi*V)
-    Y <- sqrt(-2*log(1-U))*sin(2*pi*V)
     
-    sims <- c(sims,c(X,Y))
+    sims <- c(sims,X)
   }
 
   return(sims)
@@ -312,7 +311,6 @@ N <- 20000
 hist(composicion(N), probability = TRUE, main ="N = 20000",
      xlab = "x", ylab = "Densidad", breaks = 40, ylim = c(0,1))
 curve(mezcla, from = -10, to = 10, add = T, col = "red")
-
 ```
 
 ### f) Comente sus resultados.
@@ -471,8 +469,7 @@ curve(fx, add = TRUE, lwd = 2, col = "red")
 ##############################################
 ```
 
-Podemos observar que tanto para $p_1 = 0, 1$, se cumple que el histograma se asemeja bastante al comportamiento de $f(x)$. Esto se puede explicar dado al buen algoritmo de simulación de variables Normales(4,3), y al de simulacion de variables Gama(shape = 10, rate = 0.7), además de la gran cantidad de simulaciones que estamos obteniendo, en este caso $N = 10^5$.
-Por otra parte, para $p_1 = 0.5$, notamos que el histograma no se asemeja tan bien a la curva idónea $f(x)$. Más adelante (item 3.d) se explicará el por qué de este fenomeno.
+Podemos observar que tanto para $p_1 = 0, 0.5, 1$, se cumple que el histograma se asemeja bastante al comportamiento de $f(x)$. Esto se puede explicar dado al buen algoritmo de simulación de muestras $Normal(4,3)$, y al de simulacion de muestras $Gama(shape = 10, rate = 0.7)$, además de la gran cantidad de simulaciones que estamos obteniendo, en este caso $N = 10^5$.
 
 ### d) Compare sus resultados con los obtenidos mediante las funciones `rnorm(...)` y `rgamma(...)` incluidas en R, para los mismos valores de $N$ y $p_1$.
 
@@ -558,4 +555,5 @@ df <- rbind(df, comparativa_3b)
 df
 ```
 
-Podemos apreciar que para $p_1 = 0$ y $p_1 = 1$, las medias($\mu$), desviaciones estándar($\sigma$) y varianzas($\sigma^2$) son bastante similares, sin embargo cuando $p_1 = 0.5$, notamos una gran variación en las 3 medidas. Esto se puede explicar debido a que cuando calculamos $\frac{f(x)}{g(x)}$ para encontrar $c$, el resultado de esta división es una función monotona creciente, es decir, no tiene un máximo global. Por lo que el valor de $c$ variará dependiendo del intervalo en donde se quiera encontrar el máximo.
+Podemos apreciar que para $p_1 = 0, 0.5, 1$, las medias($\mu$) son bastante similares, sin embargo cuando $p_1 = 0.5$, notamos una gran variación en la desviación estándar($\sigma$) y en su varianza($\sigma^2$). Esto se puede explicar debido a que con el método de composición, tenemos una probabilidad $p_1 = 0.5$ de generar muestras $Normal(4,3)$ y una probabilidad $p_2 = 0.5$ de generar muestras $Gama(shape = 10, rate = 0.7)$, lo que genera (tal como se ve en el gráfico del item 3.a) una gran distancia entre las muestras, provocando así una gran varianza y por consecuencia, una gran desviación estándar.
+Y cuando calculamos una muestra proveniente de $f(x) = 0.5\cdot Normal(4,3) + 0.5\cdot Gama(10,0.7)$, en R, este 0.5 lo considera como un peso que le da a cada valor de las muestras, y como no hay una probabilidad en el cálculo, las muestras estarán mas cercanas unas de otras.
