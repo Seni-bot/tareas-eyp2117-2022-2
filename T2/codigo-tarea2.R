@@ -262,7 +262,7 @@ curve(mezcla, from = -10, to = 10, add = T, col = "red")
 ## a)----
 
 par(mfrow = c(1,1))
-curve(dnorm(x, mean = 4, sd = 3), from = -10, to = 40, lwd = 2, col = "red",
+curve(dnorm(x, mean = 4, sd = sqrt(3)), from = -10, to = 40, lwd = 2, col = "red",
       main = "Normal(4,3) y Gama(shape = 10, rate = 0.7)", ylab = "Densidad")
 curve(dgamma(x, shape = 10, rate = 0.7),from = -10, to = 40, lwd = 2, col = "blue",
       add = TRUE)
@@ -470,15 +470,3 @@ df <- rbind(df, comparativa_3b)
 df
 
 ###############################################
-
-
-
-
-
-
-
-
-
-
-
-

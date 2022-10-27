@@ -337,7 +337,7 @@ $$
 ## a)----
 
 par(mfrow = c(1,1))
-curve(dnorm(x, mean = 4, sd = 3), from = -10, to = 40, lwd = 2, col = "red",
+curve(dnorm(x, mean = 4, sd = sqrt(3)), from = -10, to = 40, lwd = 2, col = "red",
       main = "Normal(4,3) y Gama(shape = 10, rate = 0.7)", ylab = "Densidad")
 curve(dgamma(x, shape = 10, rate = 0.7),from = -10, to = 40, lwd = 2, col = "blue",
       add = TRUE)
@@ -555,5 +555,4 @@ df <- rbind(df, comparativa_3b)
 df
 ```
 
-Podemos apreciar que para $p_1 = 0, 0.5, 1$, las medias($\mu$) son bastante similares, sin embargo cuando $p_1 = 0.5$, notamos una gran variación en la desviación estándar($\sigma$) y en su varianza($\sigma^2$). Esto se puede explicar debido a que con el método de composición, tenemos una probabilidad $p_1 = 0.5$ de generar muestras $Normal(4,3)$ y una probabilidad $p_2 = 0.5$ de generar muestras $Gama(shape = 10, rate = 0.7)$, lo que genera (tal como se ve en el gráfico del item 3.a) una gran distancia entre las muestras, provocando así una gran varianza y por consecuencia, una gran desviación estándar.
-Y cuando calculamos una muestra proveniente de $f(x) = 0.5\cdot Normal(4,3) + 0.5\cdot Gama(10,0.7)$, en R, este 0.5 lo considera como un peso que le da a cada valor de las muestras, y como no hay una probabilidad en el cálculo, las muestras estarán mas cercanas unas de otras.
+Podemos apreciar que para $p_1 = 0, 0.5, 1$, las medias($\mu$) son bastante similares, sin embargo cuando $p_1 = 0.5$, notamos una gran variación en la desviación estándar($\sigma$) y en su varianza($\sigma^2$). Esto se puede explicar debido a que con el método de composición, tenemos una probabilidad $p_1 = 0.5$ de generar muestras $Normal(4,3)$ y una probabilidad $p_2 = 0.5$ de generar muestras $Gama(shape = 10, rate = 0.7)$, lo que genera (tal como se ve en el gráfico del item 3.a) una gran distancia entre las muestras, provocando así una gran varianza y por consecuencia, una gran desviación estándar. Y cuando calculamos una muestra proveniente de $f(x) = 0.5\cdot Normal(4,3) + 0.5\cdot Gama(10,0.7)$, en R, este 0.5 lo considera como un peso que le da a cada valor de las muestras, y como no hay una probabilidad en el cálculo, las muestras estarán mas cercanas unas de otras.
