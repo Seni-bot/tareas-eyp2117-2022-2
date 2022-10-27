@@ -9,11 +9,12 @@ fx <- function(x){
   return(fx)
 }
 
+par(bg = "#5D7487")
 curve(fx, from = 0, to = 2, ylim = c(0,1.5),
       main = "Función f(x)",
-      ylab = "f(x)", xlab = "Valores",
+      ylab = "f(x)", xlab = "x",
       lwd = 2)
-## b) ----
+## b)----
 # Proponemos una densidad gamma con shape = 2
 
 f_g <- function(x){
@@ -26,6 +27,7 @@ cc <- optim$objective
 print(paste("El valor c para f(x) es",round(cc)))
 
 ## c)----
+par(bg = "#5D7487")
 curve(fx, from = 0, to = 10, lwd = 2, ylim = c(0,1.5), ylab = "" )
 
 curve(dgamma(x,shape = 2), from = 0, to = 10,lwd = 2,
@@ -58,11 +60,10 @@ acep_rech <- function(n){
   
   return(list(simulaciones,tasa_acep,const_norm))
 }
-
-
 ## e)----
 
-par(mfrow = c(2,2))
+par(mfrow = c(2,2),
+    bg = "#5D7487")
 
 N <- 100
 test_1 <- acep_rech(N)
@@ -98,7 +99,7 @@ curve(fx(x)*test_4[[3]],lwd = 3,
 
 # Pregunta 2 ------------------------------------------------------
 ## a) ----
-
+par(bg = "#5D7487")
 mezcla <- function(x){
   mez <- 1/3*dnorm(x, mean = -1, sd = 1/2) +
     1/3*dnorm(x, mean = 0, sd = 1) +
@@ -163,30 +164,30 @@ composicion <- function(N){
 
 ## c)----
 
-par(mfrow = c(2,2))
+par(mfrow = c(2,2),
+    bg = "#5D7487")
 
 N <- 100
 hist(composicion(N), probability = TRUE, main ="N = 100",
      xlab = "x", ylab = "Densidad", breaks = 40, ylim = c(0,1))
-curve(mezcla, from = -10, to = 10, add = T, col = "red")
+curve(mezcla, from = -10, to = 10, add = T, col = "red", lwd = 2)
 
 N <- 1000
 hist(composicion(N), probability = TRUE, main ="N = 1000",
      xlab = "x", ylab = "Densidad", breaks = 40, ylim = c(0,1))
-curve(mezcla, from = -10, to = 10, add = T, col = "red")
+curve(mezcla, from = -10, to = 10, add = T, col = "red", lwd = 2)
 
 
 N <- 10000
 hist(composicion(N), probability = TRUE, main ="N = 10000",
      xlab = "x", ylab = "Densidad", breaks = 40, ylim = c(0,1))
-curve(mezcla, from = -10, to = 10, add = T, col = "red")
+curve(mezcla, from = -10, to = 10, add = T, col = "red", lwd = 2)
 
 
 N <- 20000
 hist(composicion(N), probability = TRUE, main ="N = 20000",
      xlab = "x", ylab = "Densidad", breaks = 40, ylim = c(0,1))
-curve(mezcla, from = -10, to = 10, add = T, col = "red")
-
+curve(mezcla, from = -10, to = 10, add = T, col = "red", lwd = 2)
 
 ## d)----
 
@@ -227,31 +228,30 @@ composicion <- function(N){
 
 ## e)----
 
-par(mfrow = c(2,2))
+par(mfrow = c(2,2),
+    bg = "#5D7487")
 
 N <- 100
 hist(composicion(N), probability = TRUE, main ="N = 100",
      xlab = "x", ylab = "Densidad", breaks = 40, ylim = c(0,1))
-curve(mezcla, from = -10, to = 10, add = T, col = "red")
+curve(mezcla, from = -10, to = 10, add = T, col = "red", lwd = 2)
 
 N <- 1000
 hist(composicion(N), probability = TRUE, main ="N = 1000",
      xlab = "x", ylab = "Densidad", breaks = 40, ylim = c(0,1))
-curve(mezcla, from = -10, to = 10, add = T, col = "red")
+curve(mezcla, from = -10, to = 10, add = T, col = "red", lwd = 2)
 
 
 N <- 10000
 hist(composicion(N), probability = TRUE, main ="N = 10000",
      xlab = "x", ylab = "Densidad", breaks = 40, ylim = c(0,1))
-curve(mezcla, from = -10, to = 10, add = T, col = "red")
+curve(mezcla, from = -10, to = 10, add = T, col = "red", lwd = 2)
 
 
 N <- 20000
 hist(composicion(N), probability = TRUE, main ="N = 20000",
      xlab = "x", ylab = "Densidad", breaks = 40, ylim = c(0,1))
-curve(mezcla, from = -10, to = 10, add = T, col = "red")
-
-
+curve(mezcla, from = -10, to = 10, add = T, col = "red", lwd = 2)
 
 ## f)----
 
@@ -261,7 +261,8 @@ curve(mezcla, from = -10, to = 10, add = T, col = "red")
 # Pregunta 3--------------------------------------------------------
 ## a)----
 
-par(mfrow = c(1,1))
+par(mfrow = c(1,1),
+    bg = "#5D7487")
 curve(dnorm(x, mean = 4, sd = sqrt(3)), from = -10, to = 40, lwd = 2, col = "red",
       main = "Normal(4,3) y Gama(shape = 10, rate = 0.7)", ylab = "Densidad")
 curve(dgamma(x, shape = 10, rate = 0.7),from = -10, to = 40, lwd = 2, col = "blue",
@@ -272,7 +273,6 @@ legend(x = "topright",
        col= c("red","blue"), 
        legend=c("Normal", "Gama"),
        cex = 0.8)
-
 ## b)----
 
 fx <- function(x){
@@ -321,7 +321,8 @@ compos <- function(N, p1){
 }
 
 ## c) ----
-par(mfrow = c(2,2))
+par(mfrow = c(2,2),
+    bg = "#5D7487")
 N <- 10^5
 
 ################# Para p1 = 0 #################
@@ -387,31 +388,50 @@ curve(fx, add = TRUE, lwd = 2, col = "red")
 
 ## d)----
 
+library(gt)
+
+basic_theme <- function(data, ...){
+  data %>% 
+    tab_options(
+      table.background.color = "#0F2537",
+      ...
+    )
+}
+
 ############### Para p1 = 0 ###################
 
 # valores simulados
 simu <- aux1
-comparativa_1a <- list(tipo = "simulada",
-                       media = mean(simu),
-                       desv. = sd(simu),
-                       varianza = var(simu))
+comparativa_1a <- list(Tipo = "simulada",
+                       Media = mean(simu),
+                       D.estandar = sd(simu),
+                       Varianza = var(simu))
 
 # valores "reales"
 
 real <- rgamma(N, shape = 10, rate = 0.7)
-comparativa_1b <- list(tipo = "real",
-                       media = mean(real),
-                       desv. = sd(real),
-                       varianza = var(real))
+comparativa_1b <- list(Tipo = "real",
+                       Media = mean(real),
+                       D.estandar = sd(real),
+                       Varianza = var(real))
 
-df <- data.frame(tipo = c(),
-                 media = c(),
-                 desv. = c(),
-                 varianza = c())
+df <- data.frame(Tipo = c(),
+                 Media = c(),
+                 D.estandar = c(),
+                 Varianza = c())
 
 df <- rbind(df, comparativa_1a)
 df <- rbind(df, comparativa_1b)
-df
+
+gt(df) |> 
+  tab_header(
+    title = "Comparativa p1 = 0"
+  ) |> 
+  basic_theme(
+  ) |> 
+  tab_options(
+    table.width = pct(100)
+  )
 
 ###############################################
 
@@ -419,27 +439,36 @@ df
 
 # valores simulados
 simu <- aux2
-comparativa_2a <- list(tipo = "simulada",
-                       media = mean(simu),
-                       desv. = sd(simu),
-                       varianza = var(simu))
+comparativa_2a <- list(Tipo = "simulada",
+                       Media = mean(simu),
+                       D.estandar = sd(simu),
+                       Varianza = var(simu))
 
 # valores "reales"
 
 real <- 0.5 * rnorm(N, mean = 4, sd = sqrt(3)) + 0.5*rgamma(N, shape = 10, rate = 0.7)
-comparativa_2b <- list(tipo = "real",
-                       media = mean(real),
-                       desv. = sd(real),
-                       varianza = var(real))
+comparativa_2b <- list(Tipo = "real",
+                       Media = mean(real),
+                       D.estandar = sd(real),
+                       Varianza = var(real))
 
-df <- data.frame(tipo = c(),
-                 media = c(),
-                 desv. = c(),
-                 varianza = c())
+df <- data.frame(Tipo = c(),
+                 Media = c(),
+                 D.estandar = c(),
+                 Varianza = c())
 
 df <- rbind(df, comparativa_2a)
 df <- rbind(df, comparativa_2b)
-df
+
+gt(df) |> 
+  tab_header(
+    title = "Comparativa p1 = 0.5"
+  )|> 
+  basic_theme(
+  ) |> 
+  tab_options(
+    table.width = pct(100)
+  )
 
 ###############################################
 
@@ -447,26 +476,35 @@ df
 
 # valores simulados
 simu <- aux3
-comparativa_3a <- list(tipo = "simulada",
-                       media = mean(simu),
-                       desv. = sd(simu),
-                       varianza = var(simu))
+comparativa_3a <- list(Tipo = "simulada",
+                       Media = mean(simu),
+                       D.estandar = sd(simu),
+                       Varianza = var(simu))
 
 # valores "reales"
 
 real <- rnorm(N, mean = 4, sd = sqrt(3))
-comparativa_3b <- list(tipo = "real",
-                       media = mean(real),
-                       desv. = sd(real),
-                       varianza = var(real))
+comparativa_3b <- list(Tipo = "real",
+                       Media = mean(real),
+                       D.estandar = sd(real),
+                       Varianza = var(real))
 
-df <- data.frame(tipo = c(),
-                 media = c(),
-                 desv. = c(),
-                 varianza = c())
+df <- data.frame(Tipo = c(),
+                 Media = c(),
+                 D.estandar = c(),
+                 Varianza = c())
 
 df <- rbind(df, comparativa_3a)
 df <- rbind(df, comparativa_3b)
-df
 
-###############################################
+gt(df) |> 
+  tab_header(
+    title = "Comparativa p1 = 1"
+  )|> 
+  basic_theme(
+  ) |> 
+  tab_options(
+    table.width = pct(100)
+  )
+
+#############################################
