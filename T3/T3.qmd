@@ -1,0 +1,184 @@
+---
+title: "Tarea 3 EYP2117"
+format: 
+  html: 
+    self-contained: true
+    code-summary: "Código"
+    toc: true
+editor: visual
+lang: es
+theme: superhero
+fontsize: 85%
+---
+
+## Pregunta 1
+
+### b)
+
+```{r}
+## b)----
+set.seed(2022)
+X <- rlogis(20, location = 5, scale = 6)
+```
+
+### c)
+
+```{r}
+## c)----
+
+logL <- function(a, b){
+  aux <- -20 * log(b) - ((sum(X) - (a * 20))/b) - 2 * sum(log(1+exp((a - X)/ b)))
+  return(aux)
+}
+
+f <- function(c_0){
+  aux <- -logL(c_0[1], c_0[2])
+  return(aux)
+}
+
+c_0 <- c(1,1)
+
+min_logL <- optim(c_0, f, hessian = T)
+
+(x_est <- min_logL$par)
+
+(H_est <- -min_logL$hessian)
+```
+
+## Pregunta 2
+
+### a)
+
+```{r}
+fx_mc <- function(x){
+  aux <- x/(1+exp(x))*5
+  return(aux)
+}
+
+U <- runif(10^5,5,10)
+sims_mc <- fx_mc(U)
+theta_mc <- mean(sims_mc)
+message("El valor estimado mediante Monte Carlo es ", round(theta_mc,6))
+
+```
+
+### b)
+
+```{r}
+fx <- function(x){
+  aux <- x/(1+exp(x))
+  return(aux)
+}
+
+theta_int <- integrate(fx,lower = 5, upper = 10)$value
+
+message("El valor exacto de la integral es ",round(theta_int,6))
+```
+
+### c)
+
+```{r}
+#Control 1
+control_1 <- function(x){
+  fx <- exp(-1/2)/(1+x^2)
+  return(fx)
+}
+
+U <- runif(10^5,5,10)
+X <- fx_mc(U)
+Y <- control_1(U)
+
+c_est_1 <- function(x,y){
+  c <- -cov(x,y)/var(y)
+  return(c)
+}
+
+c_estrella_1 <- c_est_1(X,Y)
+
+sims_control_1 <- X + c_estrella_1*(Y - mean(Y))
+
+theta_control_1 <- mean(sims_control_1)
+
+#Control 2
+
+control_2 <- function(x){
+  aux <- x+1
+  return(aux)
+}
+
+U <- runif(10^5,5,10)
+X <- fx_mc(U)
+Y <- control_2(U)
+
+c_est_2 <- function(x,y){
+  c <- -cov(x,y)/var(y)
+  return(c)
+}
+
+c_estrella_2 <- c_est_2(X,Y)
+
+sims_control_2 <- X + c_estrella_2*(Y - mean(Y))
+
+theta_control_2 <- mean(sims_control_2)
+
+message("Calculando los thetas por variables de control, obtenemos que controlando por Y el valor estimado es ", round(theta_control_1,6), " mientras que con controlando por Z el valor es ", round(theta_control_2,6),". Luego, la reducción de varianza lo veremos en el item e).")
+```
+
+### d)
+
+```{r}
+#MC
+err_1 <- 100*abs(theta_mc-theta_int)/theta_int
+
+#Control1
+
+err_2 <- 100*abs(theta_control_1-theta_int)/theta_int
+
+#Control2
+err_3 <- 100*abs(theta_control_2-theta_int)/theta_int
+
+message("El error relativo porcentual del theta estimado por Monte Carlo es del ",round(err_1, 6),"%, el error del theta estimado por la variable de control Y es del ",round(err_2, 6),"% y por la variable de control Z es del ",round(err_3, 6),"%. Observamos que es un error bastante bajo (menos del 1%), por lo que todas las estimaciones se podrían considerar buenas. Sin embargo, la estimacion que menor produce error es con la variable de control Z.")
+
+```
+
+### e)
+
+```{r}
+var_mc <- var(sims_mc)
+var_c1 <- var(sims_control_1)
+var_c2 <- var(sims_control_2)
+
+red_c1 <- 100*abs(var_c1 - var_mc)/var_mc
+red_c2 <- 100*abs(var_c2 - var_mc)/var_mc
+
+message("La reducción de varianza producida por Y es de ",round(red_c1, 6),"% y por Z es de ",round(red_c2,6),"%.")
+```
+
+### f)
+
+```{r}
+par(mfrow = c(1,2))
+plot(sims_mc, type = "l", col = "hotpink2", lwd = 3,
+     xlab = "Cantidad estimaciones", ylab = "Valores theta",
+     main = "Monte carlo vs Var control 1",
+     ylim = c(0,0.23))
+lines(sims_control_1, type = "l", lwd = 2, col = "darkviolet")
+legend("topright", legend = c("Monte carlo","Var de control 1"),
+       col = c("hotpink3", "darkviolet"), lwd = 3:2, lty = 1:1, cex = 0.7)
+
+plot(sims_mc, type = "l", col = "cyan4", lwd = 3,
+     xlab = "Cantidad estimaciones", ylab = "Valores theta",
+     main = "Monte carlo vs Var control 2",
+     ylim = c(0,0.23))
+lines(sims_control_2, type = "l", lwd = 2, col = "blue3")
+legend("topright", legend = c("Monte carlo","Var de control 2"),
+       col = c("cyan4", "blue3"), lwd = 3:2, lty = 1:1, cex = 0.7)
+```
+
+Notamos en el gráfico 1 que las simulaciones producidas por la variable de control Y se acercan más al valor real de theta, además de tener una menor dispersión y por consecuencia, menor varianza. No así con el gráfico dos, que si bien al calcular su media si llega a un valor cercano al real, notamos que tiene un aumento en su dispersión, es decir, tiene más varianza que las simulaciones producidas por la variable de control Y.
+
+# Extra
+
+Feliz fin de semestre y éxito en todo :).
+
+![](images/316738353_839144940668648_4121578027764937183_n.jpg)

@@ -2,6 +2,30 @@
 
 # 1)----
 
+## b)----
+set.seed(2022)
+X <- rlogis(20, location = 5, scale = 6)
+
+## c)----
+
+logL <- function(a, b){
+  aux <- -20 * log(b) - ((sum(X) - (a * 20))/b) - 2 * sum(log(1+exp((a - X)/ b)))
+  return(aux)
+}
+
+f <- function(c_0){
+  aux <- -logL(c_0[1], c_0[2])
+  return(aux)
+}
+
+c_0 <- c(1,1)
+
+min_logL <- optim(c_0, f, hessian = T)
+
+(x_est <- min_logL$par)
+
+(H_est <- -min_logL$hessian)
+
 
 
 # 2)----
@@ -93,7 +117,6 @@ red_c1 <- 100*abs(var_c1 - var_mc)/var_mc
 red_c2 <- 100*abs(var_c2 - var_mc)/var_mc
 
 ## f)----
-
 
 par(mfrow = c(1,2))
 plot(sims_mc, type = "l", col = "hotpink2", lwd = 3,
